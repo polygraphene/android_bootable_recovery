@@ -2049,6 +2049,20 @@ void TWPartitionManager::Parse_Users() {
 						string userName = nameNode->value();
 						user.userName = userName + " (" + to_string(userId) + ")";
 					}
+					std::string path = "/data/system/users/" + to_string(userId) + "/gatekeeper.profile.key";
+					if (TWFunc::Path_Exists(path)) {
+						user.tiedParentUserId = {};
+						// profileGroupId has set if this user is included in a group consists of a parent and children.
+						xml_attribute<>* profileGroupIdAttribute = userNode->first_attribute("profileGroupId");
+						if (profileGroupIdAttribute) {
+							string profileGroupIdString = profileGroupIdAttribute->value();
+							// profileGroupId == userId means userId is parent.
+							// Only store value if userId is a child.
+							if (profileGroupIdString != to_string(userId)) {
+								user.tiedParentUserId = atoi(profileGroupIdString.c_str());
+							}
+						}
+					}
 				}
 			}
 
@@ -2144,12 +2158,19 @@ int TWPartitionManager::Decrypt_Device(string Password, int user_id) {
 		if (android::keystore::Decrypt_User(user_id, Password)) {
 			gui_msg(Msg("decrypt_user_success_fbe=User {1} Decrypted Successfully")(user_id));
 			Mark_User_Decrypted(user_id);
+
 			if (user_id == 0) {
 				// When decrypting user 0 also try all other users
 				std::vector<users_struct>::iterator iter;
 				for (iter = Users_List.begin(); iter != Users_List.end(); iter++) {
 					if ((*iter).userId == "0" || (*iter).isDecrypted)
 						continue;
+					if ((*iter).tiedParentUserId) {
+						// Since the tied user is encrypted with a randomly generated password,
+						// it is highly unlikely that the password entered by the user is accepted.
+						// Skip it to avoid being locked out.
+						continue;
+					}
 
 					int tmp_user_id = atoi((*iter).userId.c_str());
 					gui_msg(Msg("decrypting_user_fbe=Attempting to decrypt FBE for user {1}...")(tmp_user_id));
@@ -2161,9 +2182,20 @@ int TWPartitionManager::Decrypt_Device(string Password, int user_id) {
 						gui_msg(Msg("decrypt_user_fail_fbe=Failed to decrypt user {1}")(tmp_user_id));
 					}
 				}
-				Post_Decrypt("");
 			}
 
+			// Try to decrypt tied users (work profiles).
+			for (auto &&user : Users_List) {
+				if (user.userId == "0" || user.isDecrypted || !user.tiedParentUserId)
+					continue;
+				if (android::keystore::Decrypt_Tied_User(atoi(user.userId.c_str()), *user.tiedParentUserId)) {
+					Mark_User_Decrypted(atoi(user.userId.c_str()));
+				}
+			}
+
+			if (user_id == 0) {
+				Post_Decrypt("");
+			}
 			return 0;
 		} else {
 			gui_msg(Msg(msg::kError, "decrypt_user_fail_fbe=Failed to decrypt user {1}")(user_id));
