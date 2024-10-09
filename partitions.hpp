@@ -22,6 +22,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <optional>
 #include <sys/poll.h>
 #include "exclude.hpp"
 #include "tw_atomic.hpp"
@@ -311,6 +312,9 @@ struct users_struct {
 	std::string userName;
 	int type;
 	bool isDecrypted;
+
+	// Contains the parent user id if this user is tied to a parent.
+	std::optional<int> tiedParentUserId;
 };
 
 class TWPartitionManager
