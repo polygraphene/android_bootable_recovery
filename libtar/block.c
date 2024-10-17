@@ -362,7 +362,8 @@ th_read(TAR *t)
 				start += FSCRYPT_TAG_LEN;
 				if (*start == '0') {
 					start++;
-					memcpy(get_policy(t->th_buf.fep), start, fscrypt_policy_size(t->th_buf.fep));
+					uint8_t policy_version = *(uint8_t *)start;
+					memcpy(get_policy(t->th_buf.fep), start, fscrypt_policy_size_from_version(policy_version));
 #ifdef DEBUG
 					uint8_t version;
 					char content[50];
