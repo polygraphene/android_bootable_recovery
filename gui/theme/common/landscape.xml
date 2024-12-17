@@ -460,6 +460,7 @@
 				<listitem name="{@skip_digest_zip_chk=Skip Digest check before installing zip}">
 					<data variable="tw_skip_digest_check_zip"/>
 				</listitem>
+				<!--
 				<listitem name="{@auto_reflashtwrp_chk=Automatically Reflash TWRP after flashing a ROM}">
 					<conditions>
 						<condition var1="tw_has_boot_slots" var2="1"/>
@@ -468,13 +469,16 @@
 					</conditions>
 					<data variable="tw_auto_reflashtwrp"/>
 				</listitem>
+				-->
 				<listitem name="{@install_reboot_chk=Reboot after installation is complete}">
 					<data variable="tw_install_reboot"/>
 				</listitem>
+				<!--
 				<listitem name="{@inject_twrp_chk=Inject TWRP after install}">
 					<condition var1="tw_has_injecttwrp" var2="1"/>
 					<data variable="tw_inject_after_zip"/>
 				</listitem>
+				-->
 			</listbox>
 
 			<button style="main_button_half_width">
@@ -577,7 +581,7 @@
 
 			<button style="main_button_half_width">
 				<condition var1="tw_ab_device" var2="1"/>
-				<placement x="%indent%" y="%row21a_y%"/>
+				<placement x="%col2_x_left%" y="%row15a_y%"/>
 				<text>{@wipe_dalvik_btn=Wipe Dalvik}</text>
 				<actions>
 					<action function="set">tw_back=flash_done</action>
@@ -703,27 +707,27 @@
 			</text>
 
 			<text style="text_m_accent">
-				<placement x="%col1_x_left%" y="%row8_y%"/>
+				<placement x="%col1_x_left%" y="%row2_y%"/>
 				<text>{@folder=Folder:}</text>
 			</text>
 
 			<text style="text_m">
-				<placement x="%col1_x_left%" y="%row9_y%"/>
+				<placement x="%col1_x_left%" y="%row3_y%"/>
 				<text>%tw_zip_location%</text>
 			</text>
 
 			<text style="text_m_accent">
-				<placement x="%col1_x_left%" y="%row11_y%"/>
+				<placement x="%col1_x_left%" y="%row5_y%"/>
 				<text>{@file=File:}</text>
 			</text>
 
 			<text style="text_m">
-				<placement x="%col1_x_left%" y="%row12_y%"/>
+				<placement x="%col1_x_left%" y="%row6_y%"/>
 				<text>%tw_file%</text>
 			</text>
 
 			<partitionlist>
-				<placement x="%col1_x_right%" y="%row7a_y%" w="%content_half_width%" h="%partitionlist_flashimage_height%"/>
+				<placement x="%col1_x_right%" y="%row1a_y%" w="%content_half_width%" h="%partitionlist_flashimage_height%"/>
 				<icon selected="radio_true" unselected="radio_false"/>
 				<text>{@flash_image_select=Select Partition to Flash Image:}</text>
 				<data name="tw_flash_partition"/>
@@ -3063,7 +3067,7 @@
 
 			<text style="text_m">
 				<condition var1="tw_has_boot_slots" var2="1"/>
-				<placement x="%col1_x_header%" y="%row14_y%"/>
+				<placement x="%col1_x_header%" y="%row15_y%"/>
 				<text>{@current_boot_slot=Current Slot: %tw_active_slot%}</text>
 			</text>
 
@@ -3298,6 +3302,7 @@
 				<listitem name="{@unmount_sys_install=Unmount System before installing a ZIP}">
 					<data variable="tw_unmount_system"/>
 				</listitem>
+				<!--
 				<listitem name="{@auto_reflashtwrp_chk=Automatically Reflash TWRP after flashing a ROM}">
 					<conditions>
 						<condition var1="tw_has_boot_slots" var2="1"/>
@@ -3306,6 +3311,7 @@
 					</conditions>
 					<data variable="tw_auto_reflashtwrp"/>
 				</listitem>
+				-->
 			</listbox>
 
 			<checkbox>
@@ -3850,6 +3856,7 @@
 						<action function="page">confirm_action</action>
 					</actions>
 				</listitem>
+				<!--
 				<listitem name="{@reboot_install_app_hdr=Install TWRP App}">
 					<condition var1="tw_app_install_status" var2="1"/>
 					<actions>
@@ -3870,6 +3877,7 @@
 						<action function="page">confirm_action</action>
 					</actions>
 				</listitem>
+				-->
 				<listitem name="{@unmap_super_devices=Unmap Super Devices}">
 					<condition var1="tw_is_super" op="=" var2="1"/>
 					<actions>

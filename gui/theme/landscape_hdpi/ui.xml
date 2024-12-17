@@ -195,7 +195,7 @@
 		<variable name="fileselector_filemanager_height" value="840"/>
 		<variable name="partitionlist_spacing" value="0"/>
 		<variable name="partitionlist_storage_height" value="400"/>
-		<variable name="partitionlist_flashimage_height" value="448"/>
+		<variable name="partitionlist_flashimage_height" value="648"/>
 		<variable name="partitionlist_wipe_height" value="600"/>
 		<variable name="partitionlist_mount_height" value="552"/>
 		<variable name="partitionlist_backup_height" value="528"/>
