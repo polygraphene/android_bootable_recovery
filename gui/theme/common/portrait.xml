@@ -412,6 +412,7 @@
 				<listitem name="{@skip_digest_zip_chk=Skip Digest check before installing zip}">
 					<data variable="tw_skip_digest_check_zip"/>
 				</listitem>
+				<!--
 				<listitem name="{@auto_reflashtwrp_chk=Automatically Reflash TWRP after flashing a ROM}">
 					<conditions>
 						<condition var1="tw_has_boot_slots" var2="1"/>
@@ -420,13 +421,16 @@
 					</conditions>
 					<data variable="tw_auto_reflashtwrp"/>
 				</listitem>
+				-->
 				<listitem name="{@install_reboot_chk=Reboot after installation is complete}">
 					<data variable="tw_install_reboot"/>
 				</listitem>
+				<!--
 				<listitem name="{@inject_twrp_chk=Inject TWRP after install}">
 					<condition var1="tw_has_injecttwrp" var2="1"/>
 					<data variable="tw_inject_after_zip"/>
 				</listitem>
+				-->
 			</listbox>
 
 			<button style="main_button_half_height">
@@ -3470,6 +3474,7 @@
 				<listitem name="{@unmount_sys_install=Unmount System before installing a ZIP}">
 					<data variable="tw_unmount_system"/>
 				</listitem>
+				<!--
 				<listitem name="{@auto_reflashtwrp_chk=Automatically Reflash TWRP after flashing a ROM}">
 					<conditions>
 						<condition var1="tw_has_boot_slots" var2="1"/>
@@ -3478,6 +3483,7 @@
 					</conditions>
 					<data variable="tw_auto_reflashtwrp"/>
 				</listitem>
+				-->
 			</listbox>
 
 			<button style="main_button_half_height">
@@ -3959,6 +3965,7 @@
 						<action function="page">confirm_action</action>
 					</actions>
 				</listitem>
+				<!--
 				<listitem name="{@reboot_install_app_hdr=Install TWRP App}">
 					<condition var1="tw_app_install_status" var2="1"/>
 					<actions>
@@ -3979,6 +3986,7 @@
 						<action function="page">confirm_action</action>
 					</actions>
 				</listitem>
+				-->
 				<listitem name="{@unmap_super_devices=Unmap Super Devices}">
 					<condition var1="tw_is_super" op="=" var2="1"/>
 					<actions>
