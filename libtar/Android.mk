@@ -16,6 +16,8 @@ LOCAL_SHARED_LIBRARIES += libselinux
 ifeq ($(TW_INCLUDE_CRYPTO_FBE), true)
     LOCAL_STATIC_LIBRARIES += libvold libscrypt_static
     LOCAL_SHARED_LIBRARIES +=  \
+        libboot_control_client \
+        android.hardware.boot-V1-ndk \
         android.hardware.boot@1.0 \
         android.hardware.confirmationui@1.0 \
         lib_android_keymaster_keymint_utils \
