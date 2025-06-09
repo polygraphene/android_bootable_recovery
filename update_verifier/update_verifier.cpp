@@ -52,24 +52,19 @@
 #include <future>
 #include <thread>
 
+#include <BootControlClient.h>
 #include <android-base/file.h>
 #include <android-base/logging.h>
 #include <android-base/parseint.h>
 #include <android-base/properties.h>
 #include <android-base/strings.h>
 #include <android-base/unique_fd.h>
-#include <android/hardware/boot/1.0/IBootControl.h>
 #include <android/os/IVold.h>
 #include <binder/BinderService.h>
 #include <binder/Status.h>
 #include <cutils/android_reboot.h>
 
 #include "care_map.pb.h"
-
-using android::sp;
-using android::hardware::boot::V1_0::IBootControl;
-using android::hardware::boot::V1_0::BoolResult;
-using android::hardware::boot::V1_0::CommandResult;
 
 // TODO(xunchang) remove the prefix and use a default path instead.
 constexpr const char* kDefaultCareMapPrefix = "/data/ota_package/care_map";
@@ -307,18 +302,21 @@ int update_verifier(int argc, char** argv) {
     LOG(INFO) << "Started with arg " << i << ": " << argv[i];
   }
 
-  sp<IBootControl> module = IBootControl::getService();
+  const auto module = android::hal::BootControlClient::WaitForService();
   if (module == nullptr) {
     LOG(ERROR) << "Error getting bootctrl module.";
     return reboot_device();
   }
 
-  uint32_t current_slot = module->getCurrentSlot();
-  BoolResult is_successful = module->isSlotMarkedSuccessful(current_slot);
-  LOG(INFO) << "Booting slot " << current_slot << ": isSlotMarkedSuccessful="
-            << static_cast<int32_t>(is_successful);
-
-  if (is_successful == BoolResult::FALSE) {
+  uint32_t current_slot = module->GetCurrentSlot();
+  const auto is_successful = module->IsSlotMarkedSuccessful(current_slot);
+  if (!is_successful.has_value()) {
+    LOG(INFO) << "Booting slot " << current_slot << " failed";
+  } else {
+    LOG(INFO) << "Booting slot " << current_slot
+              << ": isSlotMarkedSuccessful=" << is_successful.value();
+  }
+  if (is_successful.has_value() && !is_successful.value()) {
     // The current slot has not booted successfully.
 
     bool skip_verification = false;
