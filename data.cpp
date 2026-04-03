@@ -58,6 +58,10 @@ InfoManager                             DataManager::mPersist;  // Data that tha
 InfoManager                             DataManager::mData;     // Data that is not constant and will not be saved to settings file
 InfoManager                             DataManager::mConst;    // Data that is constant and will not be saved to settings file
 
+bool gThermalError = false;
+bool gThermalInitialized = false;
+int gThermalZone = -1;
+
 extern bool datamedia;
 
 #ifndef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
@@ -659,18 +663,7 @@ void DataManager::SetDefaultValues()
 	printf("TW_NO_CPU_TEMP := true\n");
 	mConst.SetValue("tw_no_cpu_temp", "1");
 #else
-	string cpu_temp_file;
-#ifdef TW_CUSTOM_CPU_TEMP_PATH
-	cpu_temp_file = EXPAND(TW_CUSTOM_CPU_TEMP_PATH);
-#else
-	cpu_temp_file = "/sys/class/thermal/thermal_zone0/temp";
-#endif
-	if (TWFunc::Path_Exists(cpu_temp_file)) {
-		mConst.SetValue("tw_no_cpu_temp", "0");
-	} else {
-		LOGINFO("CPU temperature file '%s' not found, disabling CPU temp.\n", cpu_temp_file.c_str());
-		mConst.SetValue("tw_no_cpu_temp", "1");
-	}
+	mConst.SetValue("tw_no_cpu_temp", "0");
 #endif
 #ifdef TW_CUSTOM_POWER_BUTTON
 	printf("TW_POWER_BUTTON := %s\n", EXPAND(TW_CUSTOM_POWER_BUTTON));
@@ -1041,15 +1034,36 @@ int DataManager::GetMagicValue(const string& varName, string& value)
 		gettimeofday(&curTime, NULL);
 		if (curTime.tv_sec > cpuSecCheck)
 		{
-#ifdef TW_CUSTOM_CPU_TEMP_PATH
-			cpu_temp_file = EXPAND(TW_CUSTOM_CPU_TEMP_PATH);
+			// thermal_zone index seems to change every reboot.
+			if (!gThermalInitialized) {
+				gThermalInitialized = true;
+				gThermalError = true;
+				for (int i = 0;; i++) {
+					auto file = string("/sys/class/thermal/thermal_zone") + std::to_string(i) + "/type";
+					string type;
+					if (TWFunc::read_file(file, type) != 0) {
+						break;
+					}
+
+					if (type == "cpu-0-0-0") {
+						LOGINFO("Use thermal zone %d\n", i);
+						gThermalError = false;
+						gThermalZone = i;
+						break;
+					}
+				}
+				if (gThermalError) {
+					LOGERR("Failed to find proper thermal zone.\n");
+				}
+			}
+			if (gThermalError) {
+				return -1;
+			}
+			cpu_temp_file = string("/sys/class/thermal/thermal_zone") + std::to_string(gThermalZone) + "/temp";
+
 			if (TWFunc::read_file(cpu_temp_file, results) != 0)
 				return -1;
-#else
-			cpu_temp_file = "/sys/class/thermal/thermal_zone0/temp";
-			if (TWFunc::read_file(cpu_temp_file, results) != 0)
-				return -1;
-#endif
+
 			convert_temp = strtoul(results.c_str(), NULL, 0) / 1000;
 			if (convert_temp <= 0)
 				convert_temp = strtoul(results.c_str(), NULL, 0);
