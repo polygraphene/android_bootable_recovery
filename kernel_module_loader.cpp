@@ -166,6 +166,10 @@ exit:
 #endif
 
 	android::base::SetProperty(TW_MODULES_MOUNTED_PROP, "true");
+	// This is required for properly umount /vendor on the next step.
+	LOGINFO("Waiting for twrp.module.handler_done\n");
+	android::base::WaitForProperty("twrp.module.handler_done", "true");
+	LOGINFO("Waiting done twrp.module.handler_done\n");
 
 	return true;
 }
